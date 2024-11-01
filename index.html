@@ -1,72 +1,132 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>خريطة تفاعلية لحقول النفط في السعودية</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
-    #map { height: 600px; width: 100%; }
-    #username {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 10px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-      color: #333;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>خريطة إنتاج النفط في السعودية - الدارك مود</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #333; color: #eee; }
+        #map { height: 600px; margin-top: 20px; }
+        #welcome { font-size: 20px; font-weight: bold; color: #4CAF50; margin-bottom: 10px; }
+        .field-info { margin-top: 5px; font-size: 14px; }
+    </style>
 </head>
 <body>
-  <div id="username">إياد محمد الحربي، يرحب بك!</div>
-  <div id="map"></div>
-  
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    // إعداد الخريطة وتحديد الإحداثيات والزووم
-    var map = L.map('map').setView([23.8859, 45.0792], 5);
+    <div id="welcome">إياد محمد الحربي، يرحب بك!</div>
+    <div id="map"></div>
 
-    // إضافة طبقة الخرائط من OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    <script>
+        // إعداد الخريطة
+        var map = L.map('map').setView([23.8859, 45.0792], 5);
 
-    // إعداد أيقونة النفط
-    var oilIcon = L.icon({
-  iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Oil_Icon.svg/1200px-Oil_Icon.svg.png',  // أيقونة جديدة
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -30]
-});
+        // إضافة طبقة خريطة داكنة
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
 
-    // قائمة حقول النفط مع الإحداثيات والتفاصيل
-    var oilFields = [
-      { name: "حقل الغوار", coords: [25.277, 49.234], info: "أكبر حقل نفط تقليدي في العالم.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Al-Ghawar_Oil_Field.jpg/800px-Al-Ghawar_Oil_Field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%BA%D9%88%D8%A7%D8%B1" },
-      { name: "حقل السفانية", coords: [27.964, 48.632], info: "أكبر حقل نفط بحري في العالم.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Safaniya_oil_field.jpg/800px-Safaniya_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B3%D9%81%D8%A7%D9%86%D9%8A%D8%A9" },
-      { name: "حقل الشيبة", coords: [22.45, 53.93], info: "يقع في منطقة صحراوية نائية.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Al_Shaybah_oil_field.jpg/800px-Al_Shaybah_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B4%D9%8A%D8%A8%D8%A9" },
-      { name: "حقل بقيق", coords: [25.924, 49.667], info: "أحد أقدم الحقول مع محطة معالجة كبيرة.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Buquaiq_oil_field.jpg/800px-Buquaiq_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A8%D9%82%D9%8A%D9%82" },
-      { name: "حقل خريص", coords: [24.038, 48.331], info: "حقل كبير ومصدر مهم للنفط.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Khursaniyah_oil_field.jpg/800px-Khursaniyah_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%AE%D8%B1%D9%8A%D8%B5" },
-      { name: "حقل منيفة", coords: [27.222, 49.177], info: "حقل نفط بحري واسع النطاق.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Manifa_oil_field.jpg/800px-Manifa_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D9%85%D9%86%D9%8A%D9%81%D8%A9" },
-      { name: "حقل الحصبة", coords: [26.777, 50.225], info: "يقع في الخليج العربي ويعتمد على تقنيات حديثة.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Hasbah_oil_field.jpg/800px-Hasbah_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%AD%D8%B5%D8%A8%D8%A9" },
-      { name: "حقل مرجان", coords: [26.877, 50.103], info: "حقل نفط بحري في الخليج العربي.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Marjan_oil_field.jpg/800px-Marjan_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D9%85%D8%B1%D8%AC%D8%A7%D9%86" },
-      { name: "حقل الظلوف", coords: [28.275, 49.465], info: "حقل نفطي قريب من ساحل الخليج العربي.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Zuluf_oil_field.jpg/800px-Zuluf_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B8%D9%84%D9%88%D9%81" },
-      { name: "حقل أبو سعفة", coords: [27.937, 49.397], info: "حقل بحري مشترك مع البحرين.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Abu_Saafa_oil_field.jpg/800px-Abu_Saafa_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A3%D8%A8%D9%88_%D8%B3%D8%B9%D9%81%D8%A9" },
-      { name: "حقل الدمام", coords: [26.431, 50.118], info: "أول حقل نفطي مكتشف في المملكة.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Dammam_oil_field.jpg/800px-Dammam_oil_field.jpg", moreInfo: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%AF%D9%85%D8%A7%D9%85" }
-    ];
+        // إعداد أيقونة النفط
+        var oilIcon = L.icon({
+            iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Oil_icon.png',
+            iconSize: [30, 30]
+        });
 
-    // إضافة المواقع إلى الخريطة مع تفاصيل إضافية
-    oilFields.forEach(function(field) {
-      L.marker(field.coords, { icon: oilIcon }).addTo(map)
-        .bindPopup(`
-          <div style="text-align: center;">
-            <b>${field.name}</b><br>
-            <img src="${field.image}" style="width: 100%; height: auto;" alt="${field.name} Image"><br>
-            <p>${field.info}</p>
-            <p><a href="${field.moreInfo}" target="_blank">المزيد من المعلومات</a></p>
+        // بيانات إنتاج النفط لجميع الحقول (بيانات تجريبية)
+        var oilFields = {
+            "حقل الغوار": {
+                coords: [25.277, 49.234],
+                production: "500 ألف برميل يوميًا",
+                info: "حقل الغوار هو أكبر حقل نفط في العالم.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%BA%D9%88%D8%A7%D8%B1"
+            },
+            "حقل السفانية": {
+                coords: [27.879, 48.797],
+                production: "450 ألف برميل يوميًا",
+                info: "يعتبر حقل السفانية أكبر حقل نفط بحري في العالم.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B3%D9%81%D8%A7%D9%86%D9%8A%D8%A9"
+            },
+            "حقل الشيبة": {
+                coords: [22.505, 53.894],
+                production: "300 ألف برميل يوميًا",
+                info: "حقل الشيبة يعد من أكبر حقول النفط في الصحراء.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B4%D9%8A%D8%A8%D8%A9"
+            },
+            "حقل بقيق": {
+                coords: [25.900, 49.600],
+                production: "400 ألف برميل يوميًا",
+                info: "حقل بقيق هو أحد الحقول التقليدية الكبيرة في المملكة.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A8%D9%82%D9%8A%D9%82"
+            },
+            "حقل الخرسانية": {
+                coords: [26.800, 50.100],
+                production: "280 ألف برميل يوميًا",
+                info: "حقل الخرسانية هو أحد حقول النفط الحديثة.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%AE%D8%B1%D8%B3%D8%A7%D9%86%D9%8A%D8%A9"
+            },
+            "حقل القطيف": {
+                coords: [26.550, 50.000],
+                production: "350 ألف برميل يوميًا",
+                info: "حقل القطيف هو أحد الحقول التقليدية المهمة.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D9%82%D8%B7%D9%8A%D9%81"
+            },
+            "حقل منيفة": {
+                coords: [27.520, 49.150],
+                production: "260 ألف برميل يوميًا",
+                info: "حقل منيفة هو حقل نفط كبير متواجد في المنطقة الشرقية.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D9%85%D9%86%D9%8A%D9%81%D8%A9"
+            },
+            "حقل خريص": {
+                coords: [25.333, 48.383],
+                production: "380 ألف برميل يوميًا",
+                info: "حقل خريص هو أحد الحقول الحديثة الكبيرة.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%AE%D8%B1%D9%8A%D8%B5"
+            },
+            "حقل الظلوف": {
+                coords: [27.270, 49.370],
+                production: "240 ألف برميل يوميًا",
+                info: "حقل الظلوف هو حقل نفط حديث.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D8%B8%D9%84%D9%88%D9%81"
+            },
+            "حقل المرجان": {
+                coords: [27.350, 49.900],
+                production: "270 ألف برميل يوميًا",
+                info: "حقل المرجان هو حقل نفط مهم في المملكة.",
+                year: "2022",
+                wikipedia: "https://ar.wikipedia.org/wiki/%D8%AD%D9%82%D9%84_%D8%A7%D9%84%D9%85%D8%B1%D8%AC%D8%A7%D9%86"
+            }
+        };
+
+        // إضافة الحقول على الخريطة مع معلومات
+        function addOilField(name, data) {
+            var marker = L.marker(data.coords, {icon: oilIcon}).addTo(map);
+            
+            // محتوى النافذة المنبثقة مع المعلومات
+            var popupContent = '<strong>' + name + '</strong>' +
+                               '<div class="field-info">' + data.info + '</div>' +
+                               '<div>معدل الإنتاج: ' + data.production + '</div>' +
+                               '<div>سنة الإنتاج: ' + data.year + '</div>' +
+                               '<a href="' + data.wikipedia + '" target="_blank">المزيد من المعلومات</a>';
+            marker.bindPopup(popupContent);
+        }
+
+        // إضافة جميع الحقول مع مواقعها وبياناتها
+        for (var field in oilFields) {
+            addOilField(field, oilFields[field]);
+        }
+
+    </script>
+</body>
+</html>
           </div>
         `);
     });
